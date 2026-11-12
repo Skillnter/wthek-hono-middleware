@@ -2,32 +2,32 @@ import type { Context, ErrorHandler, Hono } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { KitHttpError, KitGeneralError } from "http-error-kit";
 import {
-    INTERNAL_SERVER_ERROR,
-    getStatusDescription,
+  INTERNAL_SERVER_ERROR,
+  getStatusDescription,
 } from "http-response-status-code";
 
 /**
  * Configuration options for KitHonoMiddleware and KitHonoErrorHandler.
  */
 export interface IKitHonoMiddlewareOptions {
-    /**
-     * Optional logger callback or boolean flag.
-     * When set to `true`, errors are logged via `console.error`.
-     * When set to a function, the function receives the error and context
-     * for custom logging (e.g. Pino, Winston).
-     *
-     * @default false
-     */
-    // eslint-disable-next-line no-unused-vars
-    log?: boolean | ((error: unknown, c: Context) => void);
+  /**
+   * Optional logger callback or boolean flag.
+   * When set to `true`, errors are logged via `console.error`.
+   * When set to a function, the function receives the error and context
+   * for custom logging (e.g. Pino, Winston).
+   *
+   * @default false
+   */
+  // eslint-disable-next-line no-unused-vars
+  log?: boolean | ((error: unknown, c: Context) => void);
 
-    /**
-     * If true, catches non-Kit errors and returns a structured 500 JSON response
-     * instead of passing raw error messages.
-     *
-     * @default false
-     */
-    handleUnknownErrors?: boolean;
+  /**
+   * If true, catches non-Kit errors and returns a structured 500 JSON response
+   * instead of passing raw error messages.
+   *
+   * @default false
+   */
+  handleUnknownErrors?: boolean;
 }
 
 /**
@@ -51,67 +51,59 @@ export interface IKitHonoMiddlewareOptions {
  * app.onError(KitHonoErrorHandler({ log: true }));
  * ```
  */
-export function KitHonoErrorHandler(
-    options?: IKitHonoMiddlewareOptions
-): ErrorHandler {
-    const { log = false, handleUnknownErrors = false } = options ?? {};
+export const KitHonoErrorHandler = (
+  options?: IKitHonoMiddlewareOptions,
+): ErrorHandler => {
+  const { log = false, handleUnknownErrors = false } = options ?? {};
 
-    return (error: Error | unknown, c: Context) => {
-        try {
-            if (log) {
-                if (typeof log === "function") {
-                    log(error, c);
-                } else {
-                    console.error(error);
-                }
-            }
-
-            if (
-                error instanceof KitHttpError ||
-                error instanceof KitGeneralError
-            ) {
-                // eslint-disable-next-line
-                const statusCode = (error.getInputs()?.statusCode ??
-                    INTERNAL_SERVER_ERROR) as number;
-                const payload =
-                    typeof error.toJSON === "function"
-                        ? error.toJSON()
-                        : error;
-                return c.json(payload, statusCode as ContentfulStatusCode);
-            }
-
-            if (handleUnknownErrors) {
-                return c.json(
-                    {
-                        statusCode: INTERNAL_SERVER_ERROR as number,
-                        message: getStatusDescription(INTERNAL_SERVER_ERROR),
-                    },
-                    INTERNAL_SERVER_ERROR as ContentfulStatusCode
-                );
-            }
-
-            const message =
-                error instanceof Error
-                    ? error.message
-                    : getStatusDescription(INTERNAL_SERVER_ERROR);
-            return c.text(
-                message,
-                INTERNAL_SERVER_ERROR as ContentfulStatusCode
-            );
-        } catch {
-            return c.text(
-                getStatusDescription(INTERNAL_SERVER_ERROR),
-                INTERNAL_SERVER_ERROR as ContentfulStatusCode
-            );
+  return (error: unknown, c: Context) => {
+    try {
+      if (log) {
+        if (typeof log === "function") {
+          log(error, c);
+        } else {
+          console.error(error);
         }
-    };
-}
+      }
+
+      if (error instanceof KitHttpError || error instanceof KitGeneralError) {
+        // eslint-disable-next-line
+        const statusCode = (error.getInputs()?.statusCode ??
+          INTERNAL_SERVER_ERROR) as number;
+        const payload =
+          typeof error.toJSON === "function" ? error.toJSON() : error;
+        return c.json(payload, statusCode as ContentfulStatusCode);
+      }
+
+      if (handleUnknownErrors) {
+        return c.json(
+          {
+            message: getStatusDescription(INTERNAL_SERVER_ERROR),
+            statusCode: INTERNAL_SERVER_ERROR as number,
+          },
+          INTERNAL_SERVER_ERROR as ContentfulStatusCode,
+        );
+      }
+
+      const message =
+        error instanceof Error
+          ? error.message
+          : getStatusDescription(INTERNAL_SERVER_ERROR);
+      return c.text(message, INTERNAL_SERVER_ERROR as ContentfulStatusCode);
+    } catch {
+      return c.text(
+        getStatusDescription(INTERNAL_SERVER_ERROR),
+        INTERNAL_SERVER_ERROR as ContentfulStatusCode,
+      );
+    }
+  };
+};
 
 /**
  * KitHonoMiddleware is a convenience wrapper that registers `KitHonoErrorHandler`
  * as the global error handler on the given Hono instance via `app.onError`.
  *
- * @param {Hono<any, any, any>} app The Hono application instance.
+ * @param {Hono} app The Hono application instance.
  * @param {IKitHonoMiddlewareOptions} [options] Optional configuration for the middleware.
  *
  * @example
@@ -123,10 +115,9 @@ export function KitHonoErrorHandler(
  * KitHonoMiddleware(app, { log: true, handleUnknownErrors: true });
  * ```
  */
-export function KitHonoMiddleware(
-    app: Hono<any, any, any>,
-    options?: IKitHonoMiddlewareOptions
-): void {
-    app.onError(KitHonoErrorHandler(options));
-}
-
+export const KitHonoMiddleware = (
+  app: Hono,
+  options?: IKitHonoMiddlewareOptions,
+): void => {
+  app.onError(KitHonoErrorHandler(options));
+};
