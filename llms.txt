@@ -1,0 +1,64 @@
+# @wthek/hono-middleware
+
+> Production-safe Hono error-handling middleware for `http-error-kit`.
+
+## Overview
+`@wthek/hono-middleware` catches `KitHttpError` and `KitGeneralError` instances thrown in Hono routes and automatically responds with the matching HTTP status code and structured JSON error payload. It integrates with Hono's `app.onError()`, supports custom logging functions, and provides optional fallback handling for unknown exceptions.
+
+## Installation
+```bash
+npm install @wthek/hono-middleware http-error-kit http-response-status-code
+```
+
+## Quick Start
+```typescript
+import { Hono } from "hono";
+import { KitHonoMiddleware } from "@wthek/hono-middleware";
+import { BadRequestError, NotFoundError } from "http-error-kit";
+
+const app = new Hono();
+
+// Register global error handling middleware
+KitHonoMiddleware(app, { log: true, handleUnknownErrors: true });
+
+app.get("/api/users/:id", (c) => {
+  const id = c.req.param("id");
+  if (!id) {
+    throw new BadRequestError("User ID is required");
+  }
+  throw new NotFoundError("User not found");
+});
+
+export default app;
+```
+
+## Scoped Error Handler (`KitHonoErrorHandler`)
+```typescript
+import { Hono } from "hono";
+import { KitHonoErrorHandler } from "@wthek/hono-middleware";
+
+const app = new Hono();
+
+// Register directly via app.onError
+app.onError(KitHonoErrorHandler({ log: true, handleUnknownErrors: true }));
+```
+
+## API Reference
+
+### `KitHonoMiddleware(app: Hono, options?: IKitHonoMiddlewareOptions)`
+Registers `KitHonoErrorHandler` on the given Hono instance via `app.onError()`.
+
+### `KitHonoErrorHandler(options?: IKitHonoMiddlewareOptions)`
+Returns a Hono-compatible error handler function: `(error: unknown, c: Context) => Response | Promise<Response>`.
+
+#### Options (`IKitHonoMiddlewareOptions`)
+- `log` (`boolean | ((error: unknown, c: Context) => void)`, default: `false`):
+  When `true`, logs via `console.error`. When a function is provided, calls custom logger callback.
+- `handleUnknownErrors` (`boolean`, default: `false`):
+  When `true`, catches non-Kit errors and returns a structured 500 JSON response instead of plain text error message.
+
+## Safety Rules for AI Agents
+1. Register `KitHonoMiddleware(app)` during application setup before defining execution exports.
+2. Throw errors directly from `http-error-kit` (e.g., `throw new NotFoundError(...)`) inside route handlers.
+3. Hono automatically catches synchronous throws and rejected promises inside handlers and directs them to `onError`.
+

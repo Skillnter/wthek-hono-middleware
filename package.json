@@ -1,6 +1,6 @@
-{
+ {
     "name": "@wthek/hono-middleware",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Production-safe Hono error-handling middleware for http-error-kit. Maps KitHttpError instances to structured JSON responses with correct HTTP status codes and optional logging.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -37,6 +37,15 @@
         "status-codes",
         "api-error",
         "json-error",
+        "rfc-7807",
+        "rfc-9457",
+        "structured-errors",
+        "api-error-response",
+        "ai-agent",
+        "agent-skill",
+        "antigravity",
+        "cursor",
+        "copilot",
         "typescript",
         "middleware",
         "wthek",
@@ -52,8 +61,8 @@
     },
     "homepage": "https://github.com/Skillnter/wthek-hono-middleware#readme",
     "dependencies": {
-        "http-error-kit": "^1.2.0",
-        "http-response-status-code": "^1.8.0"
+        "http-error-kit": "^1.5.0",
+        "http-response-status-code": "^1.9.0"
     },
     "peerDependencies": {
         "hono": "^4.0.0"
@@ -77,6 +86,7 @@
     "files": [
         "dist/index.js",
         "dist/index.d.ts",
+        "llms.txt",
         "LICENSE"
     ],
     "funding": [

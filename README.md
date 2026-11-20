@@ -14,7 +14,7 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/%40wthek%2Fhono-middleware)](https://bundlephobia.com/package/%40wthek%2Fhono-middleware)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/453f3cdfa02749c9b4c506dbbf5e103a)](https://app.codacy.com/gh/Skillnter/wthek-hono-middleware/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/453f3cdfa02749c9b4c506dbbf5e103a)](https://app.codacy.com/gh/Skillnter/wthek-hono-middleware/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
-[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/hono-middleware/1.0.0)](https://socket.dev/npm/package/@wthek/hono-middleware/overview/1.0.0)
+[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/hono-middleware/1.1.0)](https://socket.dev/npm/package/@wthek/hono-middleware/overview/1.1.0)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-121013?logo=github&logoColor=white)](https://skillnter.github.io/wthek-hono-middleware/)
 [![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA)](https://github.com/sponsors/Skillnter)
 [![Open Collective](https://img.shields.io/badge/Open%20Collective-3385FF?logo=open-collective&logoColor=white)](https://opencollective.com/skillnter)
@@ -37,6 +37,7 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 -   [Installation](#installation)
 -   [Usage](#usage)
 -   [Options](#options)
+-   [AI Agent Integration](#ai-agent-integration)
 -   [Explore More WTHek Extensions](#explore-more-wthek-extensions)
 -   [People](#people)
 -   [Donations](#donations)
@@ -109,6 +110,17 @@ KitHttpErrorConfig.configureFormatter(
         timestamp: new Date().toISOString(),
     })
 );
+```
+
+## AI Agent Integration
+
+When building with AI coding assistants (Claude Code, Cursor, GitHub Copilot, Antigravity, Devin), add the following directive to your project's `.cursorrules`, `.github/copilot-instructions.md`, or system prompt:
+
+```markdown
+### Hono Error Handling Rule
+- Always throw semantic error classes from `http-error-kit` (e.g., `BadRequestError`, `NotFoundError`, `UnauthorizedError`) inside Hono route handlers.
+- In Hono setup, register `@wthek/hono-middleware`: `KitHonoMiddleware(app, { handleUnknownErrors: true })`.
+- For scoped sub-routers or custom onError flows, use `app.onError(KitHonoErrorHandler({ handleUnknownErrors: true }))`.
 ```
 
 ## Explore More WTHek Extensions
