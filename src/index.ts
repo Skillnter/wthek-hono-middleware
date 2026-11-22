@@ -8,6 +8,14 @@ import {
 
 /**
  * Configuration options for KitHonoMiddleware and KitHonoErrorHandler.
+ *
+ * @example
+ * ```typescript
+ * const options: IKitHonoMiddlewareOptions = {
+ *   log: true,
+ *   handleUnknownErrors: true,
+ * };
+ * ```
  */
 export interface IKitHonoMiddlewareOptions {
   /**
